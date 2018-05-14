@@ -1,0 +1,113 @@
+#Problem 3
+def song_playlist(songs, max_size):
+    """
+    songs: list of tuples, ('song_name', song_len, song_size)
+    max_size: float, maximum size of total songs that you can fit
+
+    Start with the song first in the 'songs' list, then pick the next 
+    song to be the one with the lowest file size not already picked, repeat
+
+    Returns: a list of a subset of songs fitting in 'max_size' in the order 
+             in which they were chosen.
+    """
+    result = []
+    current_size = 0
+    if songs[0][2] < max_size:
+        result.append(songs[0][0])
+        current_size += songs[0][2]
+        del songs[0]
+    else:
+        return result
+    lengths = []
+    for song in songs:
+        lengths.append(song[2])
+    lengths.sort()
+    flag = True
+    while flag:
+        if songs != []:
+            for song in songs:
+                try:
+                    if current_size + lengths[0] < max_size:
+                        if song[2] == lengths[0]:
+                            result.append(song[0])
+                            current_size += song[2]
+                            songs.remove(song)
+                            del lengths[0]
+                    else:
+                        flag = False
+                except IndexError:
+                    flag = False
+        else:
+            flag = False
+    return result
+
+
+#Problem 4
+
+def greedySum2(L, s): #this version attempt to include all numbers, but will skip the first number.
+    """ input: s, positive integer, what the sum should add up to
+               L, list of unique positive integers sorted in descending order
+        Use the greedy approach where you find the largest multiplier for 
+        the largest value in L then for the second largest, and so on to 
+        solve the equation s = L[0]*m_0 + L[1]*m_1 + ... + L[n-1]*m_(n-1)
+        return: the sum of the multipliers or "no solution" if greedy approach does 
+                not yield a set of multipliers such that the equation sums to 's'
+    """
+    possilbeMultipliers = list(range(1,s+1))
+    possilbeMultipliers.sort(reverse=True)
+    mSums = []
+    multipliers = []
+    for x in range(len(L)):
+        for m in possilbeMultipliers:
+            if (m*L[x]) + sum(L[x+1:]) + sum(mSums) <= s:
+                mSums.append(m*L[x])
+                multipliers.append(m)
+                break
+    if sum(mSums) == s:
+        return sum(multipliers)
+    else:
+        return "no solution"
+        
+def greedySum(L, s):
+        """ input: s, positive integer, what the sum should add up to
+               L, list of unique positive integers sorted in descending order
+        Use the greedy approach where you find the largest multiplier for 
+        the largest value in L then for the second largest, and so on to 
+        solve the equation s = L[0]*m_0 + L[1]*m_1 + ... + L[n-1]*m_(n-1)
+        return: the sum of the multipliers or "no solution" if greedy approach does 
+                not yield a set of multipliers such that the equation sums to 's'
+    """
+    mSum = 0 #sum of the multipliers
+    for x in L: #x is a number in the list L
+        m = s // x #m is the multiplier
+        r = s - (x*m) #r is the remainder
+        mSum += m
+        s = r
+    if s == 0:
+        return mSum
+    else:
+        return "no solution"
+        
+    
+print(greedySum([10, 5, 1], 14))
+print(greedySum2([10, 5, 1], 14))
+print(greedySum([10, 5, 1], 11))
+print(greedySum2([10, 5, 1], 11))
+print(greedySum([10, 7, 6, 3], 19))
+print(greedySum2([10, 7, 6, 3], 19))
+
+
+#Problem 5
+def max_contig_sum(L):
+    """ L, a list of integers, at least one positive
+    Returns the maximum sum of a contiguous subsequence in L """
+    max_sum = sum(L)
+    for i in range(len(L)):
+        for j in range(i, len(L)):
+            currentSubSet = L[i:j+1]
+            current_sum = sum(currentSubSet)
+            if current_sum > max_sum:
+                max_sum = current_sum
+    return max_sum
+    
+max_contig_sum([3, 4, -8, 15, -1, 2])
